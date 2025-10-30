@@ -1,19 +1,31 @@
 (async () => {
-  const OWNER = "x-raw";
+
+  const USER = "x-raw";
   const REPO = "radio";
-  const PATH = "";
 
-  const res = await fetch(`https://api.github.com/repos/${OWNER}/${REPO}/contents/${PATH}`);
-  const data = await res.json();
+  const base = `https://cdn.jsdelivr.net/gh/${USER}/${REPO}`;
 
-  const tracks = data
+  // Ambil metadata file HANYA dari repo ini,
+  // otomatis ketemu semua file mp3
+  const r = await fetch(`https://data.jsdelivr.com/v1/package/gh/${USER}/${REPO}`);
+  const j = await r.json();
+
+  let tracks = j.files
     .filter(f => f.name.endsWith(".mp3"))
-    .map(f => f.download_url);
+    .map(f => `${base}${f.name}`);
 
-  const pick = tracks[Math.floor(Math.random()*tracks.length)];
+  // random satu
+  const pick = () => tracks[Math.floor(Math.random() * tracks.length)];
 
-  const audio = new Audio(pick);
+  const audio = new Audio(pick());
   audio.autoplay = true;
+  audio.volume = 1.0;
+
+  audio.addEventListener("ended", () => {
+    audio.src = pick();
+    audio.play();
+  });
 
   window.Radio = audio;
+
 })();
