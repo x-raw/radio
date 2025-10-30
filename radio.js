@@ -1,4 +1,4 @@
-(async () => {
+ (async () => {
 
   const USER = "x-raw";
   const REPO = "radio";
